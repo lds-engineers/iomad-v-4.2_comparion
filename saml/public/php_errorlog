@@ -1,0 +1,16 @@
+[08-Jan-2025 11:58:29 UTC] %date{M j H:i:s} SimpleSAMLphp ERR [fb63a35fe9] SimpleSAML\Error\CriticalConfigurationError: The configuration is invalid: The configuration (config/config.php) is invalid: syntax error, unexpected ''customauth'' (T_CONSTANT_ENCAPSED_STRING), expecting ']'
+[08-Jan-2025 11:58:29 UTC] %date{M j H:i:s} SimpleSAMLphp ERR [fb63a35fe9] Backtrace:
+[08-Jan-2025 11:58:29 UTC] %date{M j H:i:s} SimpleSAMLphp ERR [fb63a35fe9] 1 /home/customer/www/staging31.pdhstar.com/public_html/simplesaml/public/_include.php:101 (require_once)
+[08-Jan-2025 11:58:29 UTC] %date{M j H:i:s} SimpleSAMLphp ERR [fb63a35fe9] 0 /home/customer/www/staging31.pdhstar.com/public_html/simplesaml/public/module.php:12 (N/A)
+[08-Jan-2025 11:58:29 UTC] %date{M j H:i:s} SimpleSAMLphp ERR [fb63a35fe9] Error report with id a325ede5 generated.
+[08-Jan-2025 11:58:29 UTC] %date{M j H:i:s} SimpleSAMLphp DEBUG [fb63a35fe9] Localization: load domain 'messages' at '/home/customer/www/staging31.pdhstar.com/public_html/simplesaml/locales'
+[08-Jan-2025 11:58:29 UTC] %date{M j H:i:s} SimpleSAMLphp DEBUG [fb63a35fe9] Trying langpath for 'en' as '/home/customer/www/staging31.pdhstar.com/public_html/simplesaml/locales/en/LC_MESSAGES/'
+[08-Jan-2025 11:58:58 UTC] %date{M j H:i:s} SimpleSAMLphp ERR [fb63a35fe9] SimpleSAML\Error\CriticalConfigurationError: The configuration is invalid: The configuration (config/config.php) is invalid: syntax error, unexpected ''customauth'' (T_CONSTANT_ENCAPSED_STRING), expecting ']'
+[08-Jan-2025 11:58:58 UTC] %date{M j H:i:s} SimpleSAMLphp ERR [fb63a35fe9] Backtrace:
+[08-Jan-2025 11:58:58 UTC] %date{M j H:i:s} SimpleSAMLphp ERR [fb63a35fe9] 1 /home/customer/www/staging31.pdhstar.com/public_html/simplesaml/public/_include.php:101 (require_once)
+[08-Jan-2025 11:58:58 UTC] %date{M j H:i:s} SimpleSAMLphp ERR [fb63a35fe9] 0 /home/customer/www/staging31.pdhstar.com/public_html/simplesaml/public/module.php:12 (N/A)
+[08-Jan-2025 11:58:58 UTC] %date{M j H:i:s} SimpleSAMLphp ERR [fb63a35fe9] Error report with id de6de135 generated.
+[08-Jan-2025 11:58:58 UTC] %date{M j H:i:s} SimpleSAMLphp DEBUG [fb63a35fe9] Localization: load domain 'messages' at '/home/customer/www/staging31.pdhstar.com/public_html/simplesaml/locales'
+[08-Jan-2025 11:58:58 UTC] %date{M j H:i:s} SimpleSAMLphp DEBUG [fb63a35fe9] Trying langpath for 'en' as '/home/customer/www/staging31.pdhstar.com/public_html/simplesaml/locales/en/LC_MESSAGES/'
+[19-Mar-2025 07:27:01 UTC] PHP Warning:  Unterminated comment starting line 1110 in /home/customer/www/staging31.pdhstar.com/public_html/simplesaml/modules/saml/src/IdP/SAML2.php on line 1110
+[19-Mar-2025 12:28:54 UTC] PHP Warning:  Unterminated comment starting line 1105 in /home/customer/www/staging31.pdhstar.com/public_html/simplesaml/modules/saml/src/IdP/SAML2.php on line 1105
