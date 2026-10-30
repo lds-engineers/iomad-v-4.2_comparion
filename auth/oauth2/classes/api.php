@@ -345,7 +345,7 @@ class api {
     }
 
     /**
-     * Delete a users own linked login
+     * Delete linked login
      *
      * Requires auth/oauth2:managelinkedlogins capability at the user context.
      *
@@ -353,19 +353,14 @@ class api {
      * @return boolean
      */
     public static function delete_linked_login($linkedloginid) {
-        global $USER;
+        $login = new linked_login($linkedloginid);
+        $userid = $login->get('userid');
 
         if (\core\session\manager::is_loggedinas()) {
             throw new moodle_exception('notwhileloggedinas', 'auth_oauth2');
         }
 
-        $login = linked_login::get_record([
-            'id' => $linkedloginid,
-            'userid' => $USER->id,
-            'confirmtoken' => '',
-        ], MUST_EXIST);
-
-        $context = context_user::instance($login->get('userid'));
+        $context = context_user::instance($userid);
         require_capability('auth/oauth2:managelinkedlogins', $context);
 
         $login->delete();

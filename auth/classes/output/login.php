@@ -88,10 +88,7 @@ class login implements renderable, templatable {
         $this->languagemenu = $languagedata->export_for_action_menu($OUTPUT);
         $this->canloginasguest = $CFG->guestloginbutton && !isguestuser();
         $this->canloginbyemail = !empty($CFG->authloginviaemail);
-
-        // IOMAD - need to check our settings for signup link too.
-        $this->cansignup = (!empty($CFG->local_iomad_signup_showinstructions) &&
-                           ($CFG->registerauth == 'email' || !empty($CFG->registerauth)));
+        $this->cansignup = $CFG->registerauth == 'email' || !empty($CFG->registerauth);
         if ($CFG->rememberusername == 0) {
             $this->cookieshelpicon = new help_icon('cookiesenabledonlysession', 'core');
         } else {
@@ -110,11 +107,6 @@ class login implements renderable, templatable {
             $this->instructions = get_string('loginstepsnone');
         } else if ($CFG->registerauth == 'email' && empty($this->instructions)) {
             $this->instructions = get_string('loginsteps', 'core', 'signup.php');
-        }
-
-        // IOAMD - turn off instructions if we don't have it set.
-        if (empty($CFG->local_iomad_signup_showinstructions)) {
-            $this->instructions = "";
         }
 
         if ($CFG->maintenance_enabled == true) {

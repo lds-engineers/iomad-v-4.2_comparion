@@ -220,7 +220,8 @@ class Simple
 
             $as = Source::getById($this->authSource);
             if ($as !== null) {
-                $as->logout($params);
+                // uday
+                // $as->logout($params);
             }
         }
 

@@ -32,7 +32,10 @@ require('setup.php');
 // into SAML, but not into Moodle, and needs to logout of SAML in
 // order to properly re-log into Moodle. It's a rare edge case
 // probably only used when configuring or testing but nice to have.
+$return = optional_param('return', '/', PARAM_RAW); // uday
 
 $auth = new SimpleSAML\Auth\Simple($iomadsaml2auth->spname);
-$auth->logout('/');
+$auth->logout($return ?? '/'); // uday
+
+// $auth->logout('/');
 
