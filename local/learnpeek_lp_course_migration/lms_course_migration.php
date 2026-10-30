@@ -88,53 +88,79 @@ $mform->display();
 
 
 
-$learnpress_courses = [
-    'SST Courses' => [
-        ['id' => '', 'name' => 'Select LearnPress Course'],
-        ['id' => 15068, 'name' => '2-Hour Drug and Alcohol Awareness SST-302 - #15068'],
-        ['id' => 17342, 'name' => '2-Hour Drug and Alcohol Awareness SST-302 (Spanish)'],
-        ['id' => 15968, 'name' => '2-Hour Drug and Alcohol Awareness (Russian) SST-302'],
-        ['id' => 17418, 'name' => '8-Hour Fall Prevention SST-307 (Spanish)'],
-        ['id' => 16072, 'name' => '8-Hour Fall Prevention (Russian) SST-307'],
-        ['id' => 36714, 'name' => 'CE-102 Sight Distance Guidelines: 2 PDH'],
-        ['id' => 16634, 'name' => '4-Hour Fall Prevention SST-305'],
-    ],
-    'HAZWOPER' => [
-        ['id' => 19448, 'name' => '40-Hour HAZWOPER Training'],
-        ['id' => 19501, 'name' => '24-Hour HAZWOPER Training'],
-    ],
-    'COMPLIANCE CATEGORY' => [
-        ['id' => 17930, 'name' => 'Bloodborne Pathogens'],
-        ['id' => 17788, 'name' => 'Excavation Safety in Construction (Spanish)'],
-        ['id' => 17746, 'name' => 'Excavation Safety in Construction'],
-        ['id' => 17575, 'name' => 'OSHA Respiratory Protection'],
-        ['id' => 17133, 'name' => '4 Hour OSHA Scaffold Training'],
-        ['id' => 16956, 'name' => '4 Hour Fall Protection for Construction'],
-        ['id' => 16747, 'name' => 'Confined Space Entry for Construction'],
-        ['id' => 17959, 'name' => 'Radiofrequency (RF) Safety Training'],
-        ['id' => 17695, 'name' => 'MEWP: Aerial and Scissor Lifts (Spanish)'],
-        ['id' => 17643, 'name' => 'MEWP: Aerial and Scissor Lifts'],
-    ],
-    'PDF Courses' => [
-        ['id' => 37408, 'name' => 'CE-105 Reducing Wrong-Way Crashes on Freeways: 6PDH - #37408'],
-        ['id' => 36714, 'name' => 'CE-102 Sight Distance Guidelines: 2 PDH - #36714'],
-        ['id' => 14950, 'name' => 'LS-006 Data Acquisition Using LiDAR 1 PDH - #14950'],
-        ['id' => 14903, 'name' => 'OG-013 ExxonMobil Baton Rouge Refinery Disaster: 3 PDH - #14903'],
-        ['id' => 14826, 'name' => 'CE-090 Foundations in Coastal Regions: 3 PDH - #14826'],
-        // ['id' => , 'name' => ' - #'],
+// $learnpress_courses = [
+//     'SST Courses' => [
+//         ['id' => '', 'name' => 'Select LearnPress Course'],
+//         ['id' => 15068, 'name' => '2-Hour Drug and Alcohol Awareness SST-302 - #15068'],
+//         ['id' => 17342, 'name' => '2-Hour Drug and Alcohol Awareness SST-302 (Spanish)'],
+//         ['id' => 15968, 'name' => '2-Hour Drug and Alcohol Awareness (Russian) SST-302'],
+//         ['id' => 17418, 'name' => '8-Hour Fall Prevention SST-307 (Spanish)'],
+//         ['id' => 16072, 'name' => '8-Hour Fall Prevention (Russian) SST-307'],
+//         ['id' => 36714, 'name' => 'CE-102 Sight Distance Guidelines: 2 PDH'],
+//         ['id' => 16634, 'name' => '4-Hour Fall Prevention SST-305'],
+//     ],
+//     'HAZWOPER' => [
+//         ['id' => 19448, 'name' => '40-Hour HAZWOPER Training'],
+//         ['id' => 19501, 'name' => '24-Hour HAZWOPER Training'],
+//     ],
+//     'COMPLIANCE CATEGORY' => [
+//         ['id' => 17930, 'name' => 'Bloodborne Pathogens'],
+//         ['id' => 17788, 'name' => 'Excavation Safety in Construction (Spanish)'],
+//         ['id' => 17746, 'name' => 'Excavation Safety in Construction'],
+//         ['id' => 17575, 'name' => 'OSHA Respiratory Protection'],
+//         ['id' => 17133, 'name' => '4 Hour OSHA Scaffold Training'],
+//         ['id' => 16956, 'name' => '4 Hour Fall Protection for Construction'],
+//         ['id' => 16747, 'name' => 'Confined Space Entry for Construction'],
+//         ['id' => 17959, 'name' => 'Radiofrequency (RF) Safety Training'],
+//         ['id' => 17695, 'name' => 'MEWP: Aerial and Scissor Lifts (Spanish)'],
+//         ['id' => 17643, 'name' => 'MEWP: Aerial and Scissor Lifts'],
+//     ],
+//     'PDF Courses' => [
+//         ['id' => 37408, 'name' => 'CE-105 Reducing Wrong-Way Crashes on Freeways: 6PDH - #37408'],
+//         ['id' => 36714, 'name' => 'CE-102 Sight Distance Guidelines: 2 PDH - #36714'],
+//         ['id' => 14950, 'name' => 'LS-006 Data Acquisition Using LiDAR 1 PDH - #14950'],
+//         ['id' => 14903, 'name' => 'OG-013 ExxonMobil Baton Rouge Refinery Disaster: 3 PDH - #14903'],
+//         ['id' => 14826, 'name' => 'CE-090 Foundations in Coastal Regions: 3 PDH - #14826'],
+//         // ['id' => , 'name' => ' - #'],
         
-    ]
-];
+//     ]
+// ];
 
+// $lp_course_names = [];
+// foreach ($learnpress_courses as $category => $courses) {
+//     foreach ($courses as $course) {
+//         if (!empty($course['id'])) {
+//             $lp_course_names[$course['id']] = [
+//                 'name' => $course['name'],
+//                 'category' => $category
+//             ];
+//         }
+//     }
+// }
+
+$ssourl = "https://pdhstar.com";
+
+// Fetch grouped LearnPress courses from WordPress API.
+$learnpress_courses = get_learnpress_courses_from_wordpress($ssourl);
+
+// Create a lookup array: LearnPress course ID => name and category.
 $lp_course_names = [];
+
 foreach ($learnpress_courses as $category => $courses) {
+
     foreach ($courses as $course) {
-        if (!empty($course['id'])) {
-            $lp_course_names[$course['id']] = [
-                'name' => $course['name'],
-                'category' => $category
-            ];
+
+        // Skip the default "Select LearnPress Course" option.
+        if (empty($course['id'])) {
+            continue;
         }
+
+        $courseid = (int) $course['id'];
+
+        $lp_course_names[$courseid] = [
+            'name'     => $course['name'],
+            'category' => $category,
+        ];
     }
 }
 

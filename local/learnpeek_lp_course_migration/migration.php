@@ -210,52 +210,538 @@ if($migratedata->courseid){
                             }
                             $previous_cmid = $cmid;
                         }else{
+                            // $modulename = "page";
+                            // // echo "<pre>";
+                            // // echo "===============page=======================================";
+                            // // print_r($sectiondata);
+                            // // echo "</pre>"; 
+                            // // Get page module info
+                            // $getpagemdl = $DB->get_record("modules",array("name"=>"page"));
+                            // if (!$getpagemdl) {
+                            //     throw new moodle_exception('page module not found!');
+                            // }
+                            // $pagemodulesid   = $getpagemdl->id;
+                            // // Create page instance
+                            // $pagemodule = new stdClass();
+                            // $pagemodule->course        = $course_id;
+                            // $pagemodule->name          = $sectiondata->title;
+                            // $pagemodule->intro         = '';
+                            // $pagemodule->introformat   = 1;
+                            // $pagemodule->content       = $sectiondata->description;
+                            // $pagemodule->contentformat = 1;
+                            // $pagemodule->display       = 5;
+                            // $pagemodule->section       = $sectionid;
+                            // $pagemodule->module        = $pagemodulesid;
+                            // $pagemodule->modulename    = "page";
+                            // $pagemodule->visible       = 1;
+                            // $pagemodule->visibleoncoursepage = 1;
+                            // $pagemoduledata = add_moduleinfo($pagemodule, $mdlcoursedata);
+                            // $cmid = $pagemoduledata->coursemodule;
+                            // // Enable completion tracking
+                            // $DB->set_field('course_modules', 'completion', 2, ['id' => $cmid]);
+                            // $DB->set_field('course_modules', 'completionview', 1, ['id' => $cmid]); 
+                            // // Add availability restriction
+                            // if ($previous_cmid) {
+                            //     $availability = [
+                            //         "op" => "&",
+                            //         "showc" => [true],
+                            //         "c" => [
+                            //             [
+                            //                 "type" => "completion",
+                            //                 "cm" => $previous_cmid,
+                            //                 "e" => 1 // must be completed
+                            //             ]
+                            //         ]
+                            //     ];
+                            //     $availabilityjson = json_encode($availability);
+                            //     $DB->set_field('course_modules', 'availability', $availabilityjson, ['id' => $cmid]);
+                            // }
+                            // $previous_cmid = $cmid;
+
+                            //===================update code for mp3 ==========//
+
+                            // // Create a Moodle Page activity.
+                            // $modulename = "page";
+
+                            // // Get the original lesson description.
+                            // $description = $sectiondata->description;
+
+                            // // --------------------------------------------------
+                            // // 1. Resize images to fit the screen.
+                            // // --------------------------------------------------
+                            // $description = preg_replace_callback(
+                            //     '/<img\b[^>]*>/i',
+                            //     function ($matches) {
+                            //         $img = $matches[0];
+
+                            //         $responsive_style = 'max-height:70vh;max-width:100%;height:auto;width:auto;';
+
+                            //         if (preg_match('/\bstyle\s*=\s*(["\'])(.*?)\1/i', $img, $style_match)) {
+                            //             // Preserve existing styles and append responsive styles.
+                            //             $existing_style = rtrim(trim($style_match[2]), ';');
+                            //             $new_style = ($existing_style !== '' ? $existing_style . ';' : '')
+                            //                 . $responsive_style;
+
+                            //             $img = preg_replace(
+                            //                 '/\bstyle\s*=\s*(["\'])(.*?)\1/i',
+                            //                 'style="' . $new_style . '"',
+                            //                 $img,
+                            //                 1
+                            //             );
+                            //         } else {
+                            //             // Add responsive styles if no style attribute exists.
+                            //             $img = preg_replace(
+                            //                 '/<img\b/i',
+                            //                 '<img style="' . $responsive_style . '"',
+                            //                 $img,
+                            //                 1
+                            //             );
+                            //         }
+
+                            //         return $img;
+                            //     },
+                            //     $description
+                            // );
+
+                            // // Extract the MP3 URL from the WordPress audio shortcode.
+                            // $mp3url = '';
+                            // if (preg_match(
+                            //     '/\[audio\b[^\]]*mp3=["\']([^"\']+\.mp3(?:\?[^"\']*)?)["\'][^\]]*\](?:\[\/audio\])?/i',
+                            //     $description,
+                            //     $matches
+                            // )) {
+                            //     $mp3url = trim($matches[1]);
+                            // }
+
+                            // // Get Page module information.
+                            // $getpagemdl = $DB->get_record(
+                            //     "modules",
+                            //     ["name" => "page"],
+                            //     '*',
+                            //     MUST_EXIST
+                            // );
+
+                            // $pagemodule = new stdClass();
+                            // $pagemodule->course = $course_id;
+                            // $pagemodule->name = $sectiondata->title;
+                            // $pagemodule->intro = '';
+                            // $pagemodule->introformat = FORMAT_HTML;
+                            // $pagemodule->content = $description;
+                            // $pagemodule->contentformat = FORMAT_HTML;
+                            // $pagemodule->display = 5;
+                            // $pagemodule->section = $sectionid;
+                            // $pagemodule->module = $getpagemdl->id;
+                            // $pagemodule->modulename = "page";
+                            // $pagemodule->visible = 1;
+                            // $pagemodule->visibleoncoursepage = 1;
+
+                            // // --------------------------------------------------
+                            // // 4. Download MP3 and replace the shortcode.
+                            // // --------------------------------------------------
+                            // $filename = '';
+                            // $audiofile = false;
+
+                            // if (!empty($mp3url)) {
+                            //     // Download the MP3 file from WordPress.
+                            //     $audiofile = download_file_content($mp3url);
+
+                            //     if ($audiofile === false || $audiofile === '') {
+                            //         throw new moodle_exception(
+                            //             'Could not download MP3 file: ' . $mp3url
+                            //         );
+                            //     }
+
+                            //     // Extract and sanitize the original filename.
+                            //     $filename = basename(parse_url($mp3url, PHP_URL_PATH));
+                            //     $filename = clean_filename($filename);
+
+                            //     if (
+                            //         empty($filename) ||
+                            //         strtolower(pathinfo($filename, PATHINFO_EXTENSION)) !== 'mp3'
+                            //     ) {
+                            //         throw new moodle_exception(
+                            //             'Invalid MP3 filename: ' . $mp3url
+                            //         );
+                            //     }
+
+                            //     // Replace the WordPress audio shortcode with an HTML5 audio player.
+                            //     $audioplayer = '<audio controls autoplay preload="metadata" style="width:100%;">'
+                            //         . '<source src="@@PLUGINFILE@@/' . s($filename)
+                            //         . '" type="audio/mpeg">'
+                            //         . 'Your browser does not support the audio element.'
+                            //         . '</audio>';
+
+                            //     $description = preg_replace(
+                            //         '/\[audio\b[^\]]*\](?:\[\/audio\])?/i',
+                            //         $audioplayer,
+                            //         $description,
+                            //         1
+                            //     );
+
+                            //     $pagemodule->content = $description;
+                            // }
+
+                            // // Create the Moodle Page activity.
+                            // $pagemoduledata = add_moduleinfo($pagemodule, $mdlcoursedata);
+                            // $cmid = $pagemoduledata->coursemodule;
+
+                            // // Store the MP3 in this Page activity's Moodle file storage.
+                            // if (!empty($mp3url)) {
+                            //     $fs = get_file_storage();
+                            //     $context = context_module::instance($cmid);
+
+                            //     $file_record = [
+                            //         'contextid' => $context->id,
+                            //         'component' => 'mod_page',
+                            //         'filearea' => 'content',
+                            //         'itemid' => 0,
+                            //         'filepath' => '/',
+                            //         'filename' => $filename,
+                            //         'userid' => $USER->id,
+                            //         'timecreated' => time(),
+                            //         'timemodified' => time(),
+                            //     ];
+
+                            //     $storedfile = $fs->create_file_from_string(
+                            //         $file_record,
+                            //         $audiofile
+                            //     );
+
+                            //     if (!$storedfile) {
+                            //         throw new moodle_exception(
+                            //             'Failed to store MP3 file in Moodle.'
+                            //         );
+                            //     }
+                            // }
+
+                            // // Enable completion tracking.
+                            // $DB->set_field(
+                            //     'course_modules',
+                            //     'completion',
+                            //     COMPLETION_TRACKING_AUTOMATIC,
+                            //     ['id' => $cmid]
+                            // );
+
+                            // $DB->set_field(
+                            //     'course_modules',
+                            //     'completionview',
+                            //     1,
+                            //     ['id' => $cmid]
+                            // );
+
+                            // // Require the previous activity to be completed first.
+                            // if ($previous_cmid) {
+                            //     $availability = [
+                            //         'op' => '&',
+                            //         'showc' => [true],
+                            //         'c' => [
+                            //             [
+                            //                 'type' => 'completion',
+                            //                 'cm' => $previous_cmid,
+                            //                 'e' => 1
+                            //             ]
+                            //         ]
+                            //     ];
+
+                            //     $DB->set_field(
+                            //         'course_modules',
+                            //         'availability',
+                            //         json_encode($availability),
+                            //         ['id' => $cmid]
+                            //     );
+                            // }
+
+                            // $previous_cmid = $cmid;
+
+                            ///==============================================
+                            // Create a Moodle Page activity.
                             $modulename = "page";
-                            // echo "<pre>";
-                            // echo "===============page=======================================";
-                            // print_r($sectiondata);
-                            // echo "</pre>"; 
-                            // Get page module info
-                            $getpagemdl = $DB->get_record("modules",array("name"=>"page"));
-                            if (!$getpagemdl) {
-                                throw new moodle_exception('page module not found!');
+
+                            // Get the original lesson description.
+                            $description = $sectiondata->description;
+
+                            // Keep downloaded assets unique by source URL.
+                            $assets = [];
+
+                            // --------------------------------------------------
+                            // 1. Helper: download files from approved domains.
+                            // --------------------------------------------------
+                            $downloadAndPrepareAsset = function ($url) use (&$assets) {
+                                $url = html_entity_decode(trim($url), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+                                if (!filter_var($url, FILTER_VALIDATE_URL)) {
+                                    return false;
+                                }
+
+                                $host = strtolower((string) parse_url($url, PHP_URL_HOST));
+
+                                // Download only files hosted on the specified domains.
+                                $allowed_hosts = [
+                                    'pdhstar.com',
+                                    'www.pdhstar.com',
+                                ];
+
+                                if (!in_array($host, $allowed_hosts, true)) {
+                                    return false;
+                                }
+
+                                // Reuse the download for the exact same source URL.
+                                if (isset($assets[$url])) {
+                                    return $assets[$url]['filename'];
+                                }
+
+                                // Get the original filename.
+                                $path = (string) parse_url($url, PHP_URL_PATH);
+                                $original_filename = clean_filename(basename($path));
+
+                                if (empty($original_filename) || $original_filename === '.') {
+                                    $original_filename = 'asset';
+                                }
+
+                                // Add a URL hash to prevent different files with the same
+                                // original filename from colliding in Moodle file storage.
+                                $filename = substr(sha1($url), 0, 12) . '_' . $original_filename;
+                                $filename = clean_filename($filename);
+
+                                // Download the source file.
+                                $filecontent = download_file_content($url);
+
+                                if ($filecontent === false || $filecontent === '') {
+                                    throw new moodle_exception(
+                                        'Could not download source file: ' . $url
+                                    );
+                                }
+
+                                $assets[$url] = [
+                                    'filename' => $filename,
+                                    'content' => $filecontent,
+                                ];
+
+                                return $filename;
+                            };
+
+                            // --------------------------------------------------
+                            // 2. Extract the MP3 URL from the audio shortcode.
+                            // --------------------------------------------------
+                            $mp3url = '';
+
+                            if (preg_match(
+                                '/\[audio\b[^\]]*mp3=["\']([^"\']+\.mp3(?:\?[^"\']*)?)["\'][^\]]*\](?:\[\/audio\])?/i',
+                                $description,
+                                $matches
+                            )) {
+                                $mp3url = trim($matches[1]);
                             }
-                            $pagemodulesid   = $getpagemdl->id;
-                            // Create page instance
+
+                            // --------------------------------------------------
+                            // 3. Download the MP3 and replace its shortcode.
+                            // --------------------------------------------------
+                            if (!empty($mp3url)) {
+                                $audiofilename = $downloadAndPrepareAsset($mp3url);
+
+                                if ($audiofilename === false) {
+                                    throw new moodle_exception(
+                                        'The MP3 URL is not hosted on an approved domain: ' . $mp3url
+                                    );
+                                }
+
+                                $audioplayer = '<audio controls autoplay preload="metadata" style="width:100%;">'
+                                    . '<source src="@@PLUGINFILE@@/' . s($audiofilename)
+                                    . '" type="audio/mpeg">'
+                                    . 'Your browser does not support the audio element.'
+                                    . '</audio>';
+
+                                $description = preg_replace(
+                                    '/\[audio\b[^\]]*\](?:\[\/audio\])?/i',
+                                    $audioplayer,
+                                    $description,
+                                    1
+                                );
+                            }
+
+                            // --------------------------------------------------
+                            // 4. Download matching files referenced in HTML.
+                            //    Handles src, href and poster attributes.
+                            // --------------------------------------------------
+                            $description = preg_replace_callback(
+                                '/\b(src|href|poster)\s*=\s*(["\'])(.*?)\2/i',
+                                function ($matches) use ($downloadAndPrepareAsset) {
+                                    $attribute = $matches[1];
+                                    $quote = $matches[2];
+                                    $url = html_entity_decode(
+                                        $matches[3],
+                                        ENT_QUOTES | ENT_HTML5,
+                                        'UTF-8'
+                                    );
+
+                                    $filename = $downloadAndPrepareAsset($url);
+
+                                    // Keep URLs from other domains unchanged.
+                                    if ($filename === false) {
+                                        return $matches[0];
+                                    }
+
+                                    return $attribute . '=' . $quote
+                                        . '@@PLUGINFILE@@/' . s($filename)
+                                        . $quote;
+                                },
+                                $description
+                            );
+
+                            // --------------------------------------------------
+                            // 5. Resize images to fit the screen.
+                            // --------------------------------------------------
+                            $description = preg_replace_callback(
+                                '/<img\b[^>]*>/i',
+                                function ($matches) {
+                                    $img = $matches[0];
+
+                                    $responsive_style =
+                                        'max-height:70vh;max-width:100%;height:auto;width:auto;';
+
+                                    if (preg_match('/\bstyle\s*=\s*(["\'])(.*?)\1/i', $img, $style_match)) {
+                                        $existing_style = rtrim(trim($style_match[2]), ';');
+
+                                        $new_style = ($existing_style !== ''
+                                            ? $existing_style . ';'
+                                            : '') . $responsive_style;
+
+                                        $img = preg_replace(
+                                            '/\bstyle\s*=\s*(["\'])(.*?)\1/i',
+                                            'style="' . $new_style . '"',
+                                            $img,
+                                            1
+                                        );
+                                    } else {
+                                        $img = preg_replace(
+                                            '/<img\b/i',
+                                            '<img style="' . $responsive_style . '"',
+                                            $img,
+                                            1
+                                        );
+                                    }
+
+                                    return $img;
+                                },
+                                $description
+                            );
+
+                            // --------------------------------------------------
+                            // 6. Configure the Moodle Page activity.
+                            // --------------------------------------------------
+                            $getpagemdl = $DB->get_record(
+                                'modules',
+                                ['name' => 'page'],
+                                '*',
+                                MUST_EXIST
+                            );
+
                             $pagemodule = new stdClass();
-                            $pagemodule->course        = $course_id;
-                            $pagemodule->name          = $sectiondata->title;
-                            $pagemodule->intro         = '';
-                            $pagemodule->introformat   = 1;
-                            $pagemodule->content       = $sectiondata->description;
-                            $pagemodule->contentformat = 1;
-                            $pagemodule->display       = 5;
-                            $pagemodule->section       = $sectionid;
-                            $pagemodule->module        = $pagemodulesid;
-                            $pagemodule->modulename    = "page";
-                            $pagemodule->visible       = 1;
+                            $pagemodule->course = $course_id;
+                            $pagemodule->name = $sectiondata->title;
+                            $pagemodule->intro = '';
+                            $pagemodule->introformat = FORMAT_HTML;
+                            $pagemodule->content = $description;
+                            $pagemodule->contentformat = FORMAT_HTML;
+                            $pagemodule->display = 5;
+                            $pagemodule->section = $sectionid;
+                            $pagemodule->module = $getpagemdl->id;
+                            $pagemodule->modulename = 'page';
+                            $pagemodule->visible = 1;
                             $pagemodule->visibleoncoursepage = 1;
+
+                            // --------------------------------------------------
+                            // 7. Create the Moodle Page activity.
+                            // --------------------------------------------------
                             $pagemoduledata = add_moduleinfo($pagemodule, $mdlcoursedata);
                             $cmid = $pagemoduledata->coursemodule;
-                            // Enable completion tracking
-                            $DB->set_field('course_modules', 'completion', 2, ['id' => $cmid]);
-                            $DB->set_field('course_modules', 'completionview', 1, ['id' => $cmid]); 
-                            // Add availability restriction
-                            if ($previous_cmid) {
-                                $availability = [
-                                    "op" => "&",
-                                    "showc" => [true],
-                                    "c" => [
-                                        [
-                                            "type" => "completion",
-                                            "cm" => $previous_cmid,
-                                            "e" => 1 // must be completed
-                                        ]
-                                    ]
-                                ];
-                                $availabilityjson = json_encode($availability);
-                                $DB->set_field('course_modules', 'availability', $availabilityjson, ['id' => $cmid]);
+
+                            // --------------------------------------------------
+                            // 8. Store downloaded assets in Moodle file storage.
+                            // --------------------------------------------------
+                            if (!empty($assets)) {
+                                $fs = get_file_storage();
+                                $context = context_module::instance($cmid);
+
+                                foreach ($assets as $asset) {
+                                    $file_record = [
+                                        'contextid' => $context->id,
+                                        'component' => 'mod_page',
+                                        'filearea' => 'content',
+                                        'itemid' => 0,
+                                        'filepath' => '/',
+                                        'filename' => $asset['filename'],
+                                        'userid' => $USER->id,
+                                        'timecreated' => time(),
+                                        'timemodified' => time(),
+                                    ];
+
+                                    // Avoid duplicate creation if this filename already exists
+                                    // in this activity's content file area.
+                                    if (!$fs->file_exists(
+                                        $context->id,
+                                        'mod_page',
+                                        'content',
+                                        0,
+                                        '/',
+                                        $asset['filename']
+                                    )) {
+                                        $storedfile = $fs->create_file_from_string(
+                                            $file_record,
+                                            $asset['content']
+                                        );
+
+                                        if (!$storedfile) {
+                                            throw new moodle_exception(
+                                                'Failed to store file in Moodle: ' . $asset['filename']
+                                            );
+                                        }
+                                    }
+                                }
                             }
+
+                            // --------------------------------------------------
+                            // 9. Enable completion tracking.
+                            // --------------------------------------------------
+                            $DB->set_field(
+                                'course_modules',
+                                'completion',
+                                COMPLETION_TRACKING_AUTOMATIC,
+                                ['id' => $cmid]
+                            );
+
+                            $DB->set_field(
+                                'course_modules',
+                                'completionview',
+                                1,
+                                ['id' => $cmid]
+                            );
+
+                            // --------------------------------------------------
+                            // 10. Require the previous activity to be completed.
+                            // --------------------------------------------------
+                            if (!empty($previous_cmid)) {
+                                $availability = [
+                                    'op' => '&',
+                                    'showc' => [true],
+                                    'c' => [
+                                        [
+                                            'type' => 'completion',
+                                            'cm' => $previous_cmid,
+                                            'e' => 1,
+                                        ],
+                                    ],
+                                ];
+
+                                $DB->set_field(
+                                    'course_modules',
+                                    'availability',
+                                    json_encode($availability),
+                                    ['id' => $cmid]
+                                );
+                            }
+
+                            // Save the current activity for the next restriction.
                             $previous_cmid = $cmid;
                         }
                     }
@@ -335,7 +821,7 @@ if($migratedata->courseid){
                         // $quiz->reviewgeneralfeedback = 0;
                         // $quiz->reviewoverallfeedback = 0;
 
-                        // // 🔴 IMPORTANT: Hide "Right answer"
+                        // // IMPORTANT: Hide "Right answer"
                         // $quiz->reviewrightanswer = 0;
                         // === End Review Options ===
                         if (!empty($gradepass)) {
