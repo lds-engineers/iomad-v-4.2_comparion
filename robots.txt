@@ -1,0 +1,18 @@
+User-agent: *
+
+Disallow: /courses/index.php
+Disallow: /courses/guestcartitems.php
+Disallow: /courses/guestcheckout.php
+Disallow: /courses/item.php
+Disallow: /courses/tevent.php
+Disallow: /courses/sidebarnav.php
+Disallow: /courses/locallib.php
+Disallow: /courses/mycourse.php
+Disallow: /courses/event.php
+Disallow: /courses/header.php
+Disallow: /courses/shop-new.php
+Disallow: /courses/guestcart.php
+Disallow: /courses/update_license_quantity.php
+Disallow: /courses/guestitemdelete.php
+Disallow: /courses/guestcouponremove.php
+Disallow: /courses/mycourse-2.php
