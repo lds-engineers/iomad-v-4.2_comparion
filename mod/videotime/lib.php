@@ -404,6 +404,27 @@ function videotime_pluginfile($course, $cm, $context, $filearea, $args, $forcedo
 function videotime_view(videotime_instance $videotime, $course, $cm, $context) {
     global $USER;
 
+    // // Trigger course_module_viewed event.
+    // $params = [
+    //     'context' => $context,
+    //     'objectid' => $videotime->id,
+    // ];
+
+    // $event = \mod_videotime\event\course_module_viewed::create($params);
+    // $event->add_record_snapshot('course_modules', $cm);
+    // $event->add_record_snapshot('course', $course);
+    // $event->add_record_snapshot('videotime', $videotime->to_record());
+    // $event->trigger();
+
+    // // Completion.
+    // $completion = new completion_info($course);
+    // $completion->set_module_viewed($cm);
+}
+
+// Suneet custom function Completion and trigger events.
+function completion_status_videotime_view(videotime_instance $videotime, $course, $cm, $context) { 
+    global $USER;
+
     // Trigger course_module_viewed event.
     $params = [
         'context' => $context,

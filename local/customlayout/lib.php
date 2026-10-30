@@ -179,18 +179,43 @@ function local_customlayout_before_footer()
     $logourl = $OUTPUT->get_logo_url();
 
     //Get company logo
-    if($companyid > 0){
-        $comlogodetails = $DB->get_record_sql('SELECT * FROM {company_logo} WHERE company_id = ?',array($companyid));
-        if($comlogodetails){
+    if ($companyid > 0) {
+        $comlogodetails = $DB->get_record(
+            'company_logo',
+            ['company_id' => $companyid]
+        );
+
+        if ($comlogodetails) {
+
+            // First priority: logo_mobile_topbar
             $complogo = $DB->get_record_sql(
-                "SELECT * FROM {files} 
-                WHERE contextid= 1 
-                AND component='landingpage' 
-                AND itemid= ? 
-                AND filesize > 0 
-                AND filearea = ?", 
-                array($comlogodetails->id,'logo_mobile_topbar')
+                "SELECT *
+                 FROM {files}
+                 WHERE contextid = 1
+                   AND component = 'landingpage'
+                   AND itemid = ?
+                   AND filesize > 0
+                   AND filearea = ?
+                 ORDER BY id DESC",
+                [$comlogodetails->id, 'logo_mobile_topbar']
             );
+
+            // Second priority: logo_image
+            if (!$complogo) {
+                $complogo = $DB->get_record_sql(
+                    "SELECT *
+                     FROM {files}
+                     WHERE contextid = 1
+                       AND component = 'landingpage'
+                       AND itemid = ?
+                       AND filesize > 0
+                       AND filearea = ?
+                     ORDER BY id DESC",
+                    [$comlogodetails->id, 'logo_image']
+                );
+            }
+
+            // Use company logo if available
             if ($complogo) {
                 $logourl = $CFG->wwwroot .
                     '/blocks/custom_mycourse/file.php?id=' .

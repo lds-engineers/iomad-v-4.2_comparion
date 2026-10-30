@@ -96,4 +96,30 @@ function customcoursecolor($courseid) {
 	$color = $basecolors[$courseid % 10];
 	return $color;
 }
+// Learnpress All courses
+function get_learnpress_courses_from_wordpress($url) {
+    global $CFG;
+
+    require_once($CFG->libdir . '/filelib.php');
+
+    $api_url = $url.'/wp-json/custom/v1/learnpress-courses';
+
+    $curl = new curl();
+
+    $response = $curl->get($api_url);
+
+    if ($curl->get_errno()) {
+        debugging('LearnPress API request failed: ' . $curl->error, DEBUG_DEVELOPER);
+        return [];
+    }
+
+    $courses = json_decode($response, true);
+
+    if (json_last_error() !== JSON_ERROR_NONE || !is_array($courses)) {
+        debugging('Invalid LearnPress API response.', DEBUG_DEVELOPER);
+        return [];
+    }
+
+    return $courses;
+}
 ?>

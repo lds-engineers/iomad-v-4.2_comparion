@@ -10,6 +10,23 @@ $userid = $_REQUEST['accesstoken'];
 $courseid = $_REQUEST['accessvailidc'];
 $launchurl = urldecode($_REQUEST['launchurl']);
 
+
+/*********************Sushil start 2026-10-22**************************/
+// Add SSOCode only if it does not already exist.
+$query = parse_url($launchurl, PHP_URL_QUERY);
+parse_str($query ?? '', $params);
+
+if (!array_key_exists('SSOCode', $params)) {
+    $separator = (strpos($launchurl, '?') === false)
+        ? '?'
+        : ((substr($launchurl, -1) === '?' || substr($launchurl, -1) === '&') ? '' : '&');
+
+    $launchurl .= $separator . 'SSOCode=lpeek';
+}
+/*********************Sushil ends 2026-10-22**************************/
+
+
+
 $validatetoken = $DB->get_record('user_private_key', array('script' => "sso_lms_learnpeek", 'userid' => $userid, 'value' => $usertokenkey));
 
 if($validatetoken){

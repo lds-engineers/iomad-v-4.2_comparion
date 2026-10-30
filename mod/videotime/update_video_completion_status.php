@@ -20,7 +20,7 @@
  * @package     mod_videotime
  * @copyright   2021 bdecent gmbh <https://bdecent.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+ */ 
 
 use mod_videotime\output\next_activity_button;
 use mod_videotime\videotime_instance;

@@ -72,6 +72,7 @@ if ($edit !== null && confirm_sesskey() && $PAGE->user_allowed_editing()) {
 $moduleinstance = videotime_instance::instance_by_id($moduleinstance->id);
 $moduleinstance->setup_page();
 
+ // Completion and trigger events.
 videotime_view($moduleinstance, $course, $cm, $moduleinstance->get_context());
 
 $renderer = $PAGE->get_renderer('mod_videotime');
@@ -105,58 +106,165 @@ echo $OUTPUT->footer();
 ?>
 <!-- ------------------sushil start ----------------------------------->
 <script>
+    var id = <?php echo $id;?>;
     var currentvideoid = 0;
     var secondvideoplayed = 0;
     var percentvideoplayed = 0;
     var videotracker = null;
     var playcounter = 0;
-    setTimeout(function() {
-        require(['https://player.vimeo.com/api/player.js'], function (Player) {
-            var iframe1 = $('.vimeo-embed iframe')[0];
-            console.log("iframe1- ", iframe1);
-            var player1 = new Player(iframe1);
-            player1.on('play', startvideotracking);
-            player1.on('pause', onPause111);
-            player1.on('ended', onFinish111);
-            player1.on('progress', onPlayProgress111);
-            player1.getVideoId().then(function(id) {
-                currentvideoid = id;
-                console.log("currentvideoid- ", currentvideoid)
-                // $.post("get_video_duration.php", {moduleid: "<?php echo  $id; ?>",videoid:currentvideoid}).done(function(playeddata){
-                //     console.log("get duration",playeddata);
-                //     player1.setCurrentTime(parseInt(playeddata)-30).then(function(seconds) {
-                //         console.log("set success", seconds);
-                //     }).catch(function(error) {
-                //         console.log("set error", error);
-                //     });
-                // });
-            }).catch(function(error) {
-                console.log("Video id error:- ", error);
-            });
-        });
-    }, 3000);
+    var vimeoPlayerInitialized = false;
+    var vimeoPlayerInitializing = false;
+    var vimeoInitAttempts = 0;
+    var vimeoInitTimer = null;
+    var vimeoPlayerInstance = null;
+
+    function initializeVimeoTracking() {
+
+        // Do not initialize the player more than once.
+        if (vimeoPlayerInitialized || vimeoPlayerInitializing) {
+            return;
+        }
+
+        // Find only a real Vimeo iframe.
+        var iframe1 = document.querySelector(
+            '.vimeo-embed iframe[src*="vimeo.com"], ' +
+            '.vimeo-embed iframe[src*="player.vimeo.com"]'
+        );
+
+        // Iframe may not have been created yet.
+        if (!iframe1 || !iframe1.isConnected) {
+            vimeoInitAttempts++;
+
+            if (vimeoInitAttempts <= 30) {
+                vimeoInitTimer = window.setTimeout(
+                    initializeVimeoTracking,
+                    1000
+                );
+            } else {
+                console.warn(
+                    '[Vimeo tracking] Vimeo iframe not found after 30 attempts.'
+                );
+            }
+
+            return;
+        }
+
+        // console.log('[Vimeo tracking] Valid iframe found:', iframe1);
+
+        vimeoPlayerInitializing = true;
+
+        require(
+            ['https://player.vimeo.com/api/player.js'],
+            function(Player) {
+
+                // Recheck the iframe before initializing.
+                if (!iframe1.isConnected) {
+                    vimeoPlayerInitializing = false;
+                    initializeVimeoTracking();
+                    return;
+                }
+
+                try {
+                    var player1 = new Player(iframe1);
+
+                    vimeoPlayerInstance = player1;
+
+                    player1.on('play', startvideotracking);
+                    player1.on('pause', onPause111);
+                    player1.on('ended', onFinish111);
+                    player1.on('progress', onPlayProgress111);
+
+                    player1.getVideoId().then(function(videoid) {
+                        currentvideoid = videoid;
+                        vimeoPlayerInitialized = true;
+
+                        // console.log(
+                        //     '[Vimeo tracking] Initialized successfully:',
+                        //     currentvideoid
+                        // );
+                    }).catch(function(error) {
+                        console.error(
+                            '[Vimeo tracking] Video ID error:',
+                            error
+                        );
+                    }).finally(function() {
+                        vimeoPlayerInitializing = false;
+                    });
+
+                } catch (error) {
+                    vimeoPlayerInitializing = false;
+
+                    console.error(
+                        '[Vimeo tracking] Initialization error:',
+                        error
+                    );
+                }
+            },
+            function(error) {
+                vimeoPlayerInitializing = false;
+
+                console.error(
+                    '[Vimeo tracking] Vimeo API loading failed:',
+                    error
+                );
+            }
+        );
+    }
+
+    // Try immediately; retry only if the iframe is not ready.
+    initializeVimeoTracking();
+
+
     function onPause111() {
         console.log('paused');
         // status.text('paused');
     }
 
     function onFinish111() {
-        console.log('finished');
-        // status.text('finished');
+        // console.log('Video finished, updating status...');
+
+        $.ajax({
+            url: '<?php echo $CFG->wwwroot; ?>/mod/videotime/updated_completion_status_videotime_view.php',
+            type: 'POST',
+            data: {
+                cmid: id,
+                sesskey: M.cfg.sesskey
+            },
+            success: function(response) {
+                // console.log("Success:", response);
+                if (response.status === 'success') {
+                    // Inject the dynamic Next Activity button layout
+                    if (response.buttonhtml !== '') {
+                        $('#next-activity').html(response.buttonhtml);
+                    }
+
+                    //  hide the lock icon
+                    // if (response.nextcmid > 0) {
+                    //     var targetAnchor = $('.courseindex-link[href="#module-' + response.nextcmid + '"]');
+                    //     if (targetAnchor.length > 0) {
+                    //         // Find the sibling locked span container right next to the link text and remove it
+                    //         targetAnchor.siblings('.courseindex-locked').hide();
+                    //     }
+                    // }
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Status:", status);
+                console.error("Error:", error);
+                console.error("Response:", xhr.responseText);
+            }
+        });
     }
     function startvideotracking() {
         var modleid = "<?php echo  $id; ?>";
         console.log("startvideotracking- ", playcounter);
         if(playcounter == 0 || (playcounter % 3) == 0){
             console.log("startvideotracking updated at - ", playcounter);
-            // $.post("update_video_duration.php", {moduleid: modleid,videoid:currentvideoid,timeplayed:secondvideoplayed, percent:percentvideoplayed}).done(function(data){
-            //     console.log("Updated duration",data);
-            // });
         }
     }
 
     function onPlayProgress111(data) {
-        console.log(data);
+        // console.log(data);
         var vsec= data.seconds;
         secondvideoplayed = vsec;
         percentvideoplayed = data.percent;
@@ -167,11 +275,261 @@ echo $OUTPUT->footer();
         var modleid = "<?php echo  $id; ?>";
         console.log("vsec- ", vsec);
         if(vsec >= (duration * 0.9)){
-            // $.post("check_video_duration.php", {moduleid: modleid,video_url:src,timeplayed:vsec,duration:duration}).done(function(data){
-            //         console.log(data);
-            //     });
         } else {
             console.log("not completed");
         }
     }
+
+
+
+
+    /****  Start YouTube tracking  ********/
+    var trackedMoodlePlayers = [];
+    var youtubeCompletionSent = false;
+    var youtubeTrackingTimer = null;
+    var moodleYouTubeObserver = null;
+
+    function initializeMoodleYouTubeTracking() {
+        document.querySelectorAll('.video-js.vjs-youtube').forEach(function(el) {
+            var player = el.player;
+
+            if (
+                !player ||
+                typeof player.currentTime !== 'function' ||
+                typeof player.duration !== 'function' ||
+                typeof player.on !== 'function' ||
+                el.dataset.moodleCompletionTracking === '1'
+            ) {
+                return;
+            }
+
+            el.dataset.moodleCompletionTracking = '1';
+
+            var item = {
+                player: player,
+                intervals: [],
+                lastTime: null,
+                completed: false
+            };
+
+            trackedMoodlePlayers.push(item);
+
+            player.on('playing', function() {
+                // console.log('[Moodle tracking] YouTube playing:', player.id());
+                startMoodleYouTubeTracking();
+            });
+
+            player.on('pause', function() {
+                item.lastTime = null;
+                // console.log('[Moodle tracking] YouTube paused:', player.id());
+            });
+
+            player.on('ended', function() {
+                // console.log('[Moodle tracking] YouTube ended:', player.id());
+
+                var duration = Number(player.duration());
+                var currentTime = Number(player.currentTime());
+
+                if (
+                    isFinite(duration) &&
+                    duration > 0 &&
+                    isFinite(currentTime)
+                ) {
+                    if (
+                        item.lastTime !== null &&
+                        currentTime > item.lastTime
+                    ) {
+                        var delta = currentTime - item.lastTime;
+
+                        if (delta > 0 && delta <= 3) {
+                            item.intervals.push({
+                                start: item.lastTime,
+                                end: Math.min(currentTime, duration)
+                            });
+                        }
+                    }
+
+                    item.lastTime = null;
+
+                    trackMoodleYouTubeProgress(item);
+
+                    // Natural video end is also a completion signal.
+                    // The percentage check below still handles watched coverage.
+                    if (currentTime >= duration - 1) {
+                        item.completed = true;
+
+                        checkMoodleYouTubeCompletion();
+                    }
+                }
+            });
+        });
+    }
+
+    function startMoodleYouTubeTracking() {
+        if (youtubeTrackingTimer !== null) {
+            return;
+        }
+
+        youtubeTrackingTimer = window.setInterval(function() {
+            trackedMoodlePlayers.forEach(function(item) {
+                trackMoodleYouTubeProgress(item);
+            });
+        }, 1000);
+    }
+
+    function trackMoodleYouTubeProgress(item) {
+        if (item.completed) {
+            return;
+        }
+
+        try {
+            var player = item.player;
+
+            if (!player || player.isDisposed()) {
+                return;
+            }
+
+            var currentTime = Number(player.currentTime());
+            var duration = Number(player.duration());
+
+            if (
+                !isFinite(currentTime) ||
+                !isFinite(duration) ||
+                duration <= 0
+            ) {
+                return;
+            }
+
+            if (player.paused() && currentTime < duration) {
+                item.lastTime = null;
+                return;
+            }
+
+            if (item.lastTime !== null) {
+                var delta = currentTime - item.lastTime;
+
+                // Ignore seeking and large playback jumps.
+                if (delta > 0 && delta <= 2.5) {
+                    item.intervals.push({
+                        start: item.lastTime,
+                        end: Math.min(currentTime, duration)
+                    });
+                }
+            }
+
+            item.lastTime = currentTime;
+
+            // Merge overlapping intervals to avoid counting replayed sections twice.
+            var ranges = item.intervals.slice().sort(function(a, b) {
+                return a.start - b.start;
+            });
+
+            var watched = 0;
+            var start = null;
+            var end = null;
+
+            ranges.forEach(function(range) {
+                if (start === null) {
+                    start = range.start;
+                    end = range.end;
+                } else if (range.start <= end) {
+                    end = Math.max(end, range.end);
+                } else {
+                    watched += end - start;
+                    start = range.start;
+                    end = range.end;
+                }
+            });
+
+            if (start !== null) {
+                watched += end - start;
+            }
+
+            var percent = Math.min(100, watched / duration * 100);
+
+            // console.log('[Moodle tracking] YouTube progress:', {
+            //     player: player.id(),
+            //     currentTime: currentTime.toFixed(1),
+            //     duration: duration.toFixed(1),
+            //     watchedSeconds: watched.toFixed(1),
+            //     percentage: percent.toFixed(2) + '%'
+            // });
+
+            if (percent >= 95) {
+                item.completed = true;
+
+                console.log('[YouTube] Sending completion request:', {
+                    cmid: id,
+                });
+
+                checkMoodleYouTubeCompletion();
+            }
+        } catch (error) {
+            console.error('[Moodle tracking] YouTube progress error:', error);
+        }
+    }
+
+    function checkMoodleYouTubeCompletion() {
+        if (
+            trackedMoodlePlayers.length > 0 &&
+            trackedMoodlePlayers.every(function(item) {
+                return item.completed;
+            }) &&
+            !youtubeCompletionSent
+        ) {
+            youtubeCompletionSent = true;
+
+            console.log('[Moodle tracking] Sending YouTube completion update');
+
+            $.ajax({
+                url: '<?php echo $CFG->wwwroot; ?>/mod/videotime/updated_completion_status_videotime_view.php',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    cmid: Number(id),
+                    sesskey: M.cfg.sesskey
+                },
+                success: function(response) {
+                    // console.log('[YouTube] Completion response:', response);
+
+                    if (response.status === 'success' && response.buttonhtml) {
+                        $('#next-activity').html(response.buttonhtml);
+                    } else {
+                        console.warn('[YouTube] No next button returned:', {
+                            cmid: id,
+                            nextcmid: response.nextcmid,
+                            buttonhtml: response.buttonhtml
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('[YouTube] Completion request failed:', {
+                        cmid: id,
+                        status: status,
+                        error: error,
+                        response: xhr.responseText
+                    });
+
+                    youtubeCompletionSent = false;
+                }
+            });
+        }
+    }
+
+    // Detect players that already exist.
+    initializeMoodleYouTubeTracking();
+
+    // Detect Video.js players created later by the activity.
+    if (!moodleYouTubeObserver) {
+        moodleYouTubeObserver = new MutationObserver(function() {
+            initializeMoodleYouTubeTracking();
+        });
+
+        moodleYouTubeObserver.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    }
+
+    /* END YouTube tracking */
 </script>
